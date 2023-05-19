@@ -1,98 +1,47 @@
-import React, { useState } from 'react';
-import { TextField, Button, Switch, FormControlLabel } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import DadosPessoais from './DadosPessoais';
+import DadosUsuario from './DadosUsuario';
+import DadosEntrega from './DadosEntrega';
+import { StepLabel, Stepper, Step, Typography } from '@mui/material';
 
 
-function FormularioCadastro({aoEnviar, validarCPF}) {
-    const [nome, setNome] = useState("");
-    const [sobrenome, setSobrenome] = useState("");
-    const [cpf, setCpf] = useState("");
-    const [promocoes, setPromocoes] = useState(true);
-    const [novidades, setNovidades] = useState(false);
-    const [erros, setErros] = useState({cpf:{valido:true, texto:""}});
+function FormularioCadastro({ aoEnviar, validarCPF }) {
+    const [etapaAtual, setEtapaAtual] = useState(0);
+    const [dadosColetados, setDados] = useState({});
 
-    return (
-        <form
-            onSubmit={(event) => {
-                event.preventDefault();
-                aoEnviar({ nome, sobrenome, cpf, novidades, promocoes});
-            }}
-        >
-            <TextField
-                value={nome}
-                onChange={(event) => {
-                    setNome(event.target.value);
-                }}
-                id="nome"
-                label="Nome"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-            />
-            <TextField
-                value={sobrenome}
-                onChange={(event) => {
-                    setSobrenome(event.target.value);
-                }}
-                id="sobrenome"
-                label="Sobrenome"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-            />
-            <TextField
-                value={cpf}
-                onChange={(event) => {
-                    setCpf(event.target.value);
-                }}
-                onBlur={(event) =>{
-                  const eValido = validarCPF(cpf);
-                  setErros({cpf:eValido})               
-                }}
-                error={!erros.cpf.valido}
-                helperText={erros.cpf.texto}
-                id="CPF"
-                label="CPF"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-            />
-          
+    useEffect(() => {
+        if (etapaAtual === formularios.length - 1) {
+            aoEnviar(dadosColetados);
 
-            <FormControlLabel
-                label="Promoções"
-                control={
-                    <Switch
-                        checked={promocoes}
-                        onChange={(event) => {
-                            setPromocoes(event.target.checked);
-                        }}
-                        name="promocoes"
-                        color="primary"
-                    />
-                }
-            />
-            <FormControlLabel
-                label="Novidades"
-                control={
-                    <Switch
-                        checked={novidades}
-                        onChange={(event) => {
-                            setNovidades(event.target.checked);
-                        }}
-                        name="novidades"
-                        color="primary"
-                    />
-                }
+        }
 
-            />
+    })
 
-            <Switch name="promocoes" defaultChecked color='primary' />
+    const formularios = [
+        <DadosUsuario aoEnviar={coletarDados} />,
+        <DadosPessoais aoEnviar={coletarDados} validarCPF={validarCPF} />,
+        <DadosEntrega aoEnviar={coletarDados} />,
+        <Typography variant="h5">Obrigado pelo Cadastro </Typography>
+    ];
 
-            <Button type='submit' variant="contained" color="primary">
-                Cadastrar
-            </Button>
-        </form>
-    );
+    function coletarDados(dados) {
+        setDados({ ...dadosColetados, ...dados });
+        proximo();
+    }
+
+    function proximo() {
+        setEtapaAtual(etapaAtual + 1);
+    }
+
+    return <>
+        <Stepper activeStep={etapaAtual}>
+            <Step><StepLabel>Login</StepLabel></Step>
+            <Step><StepLabel>Pessoal</StepLabel></Step>
+            <Step><StepLabel>Entrega</StepLabel></Step>
+            <Step><StepLabel>Finalização</StepLabel></Step>
+        </Stepper>
+        {formularios[etapaAtual]}
+    </>;
 }
 
 export default FormularioCadastro;
