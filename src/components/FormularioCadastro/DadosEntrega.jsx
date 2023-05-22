@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import { TextField, Button } from '@mui/material';
 
 
-function DadosEntrega({aoEnviar}) {
+function DadosEntrega({ aoEnviar }) {
     const [cep, setCep] = useState("");
     const [endereco, setEndereco] = useState("");
     const [numero, setNumero] = useState("");
     const [estado, setEstado] = useState("");
     const [cidade, setCidade] = useState("");
     return (
-        <form 
-        onSubmit={(event) => {
+        <form
+            onSubmit={(event) => {
                 event.preventDefault();
                 aoEnviar({ cep, endereco, numero, estado, cidade });
-
             }}
         >
             <TextField
@@ -84,7 +83,6 @@ function DadosEntrega({aoEnviar}) {
                 Finalizar Cadastro
             </Button>
         </form>
-
     );
 }
 
